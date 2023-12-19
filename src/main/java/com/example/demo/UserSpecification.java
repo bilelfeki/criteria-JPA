@@ -1,11 +1,11 @@
 package com.example.demo;
 
 import com.example.demo.entities.User;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserSpecification implements Specification<User> {
   private SearchCriteria criteria;
@@ -16,13 +16,12 @@ public class UserSpecification implements Specification<User> {
 
   @Override
   public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-    System.out.println(root.get("email"));
-    if(criteria.getOperation().equalsIgnoreCase(">")){
-      System.out.println("after");
-      System.out.println(query.getParameters());
-      return criteriaBuilder.equal(
-      root.get("email"),"semi@gmail.com");
-    }
-    return null;
+    query.distinct(true);
+    List<Order> orderList = new ArrayList<>();
+    orderList.add(criteriaBuilder.asc(root.get("servers.serverName")));
+    orderList.add(criteriaBuilder.asc(root.get("email")));
+
+    query.orderBy(orderList);
+    return criteriaBuilder.equal(root.get("email"), "semi@gmail.com");
   }
 }
